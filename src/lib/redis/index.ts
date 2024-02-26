@@ -1,8 +1,9 @@
+import { Query } from "@upstash/query";
 import { Redis } from "@upstash/redis";
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+export const q = new Query({
+  redis: Redis.fromEnv({ automaticDeserialization: false }),
 });
 
-export default redis;
+
+
