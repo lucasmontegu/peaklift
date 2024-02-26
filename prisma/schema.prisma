@@ -1,0 +1,79 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TrainingPlan {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  weeks     Week[]
+
+  @@map("training_plans")
+}
+
+model Week {
+  id             String @id @default(uuid())
+  trainingPlanId String @map("training_plan_id")
+  weekNumber     Int    @map("week_number")
+  days           Day[]
+
+  trainingPlan TrainingPlan @relation(fields: [trainingPlanId], references: [id])
+
+  @@map("weeks")
+}
+
+model Day {
+  id         String     @id @default(uuid())
+  weekId     String     @map("week_id")
+  dayEn      DAYS       @map("day_en")
+  activities Activity[]
+
+  week Week @relation(fields: [weekId], references: [id])
+
+  @@map("days")
+}
+
+model Activity {
+  id      String @id @default(uuid())
+  dayId   String @map("day_id")
+  type    ACTIVITY_TYPE
+  details Json   @map("details") // Campo JSONB para almacenar los detalles de la actividad de forma flexible
+
+  day Day @relation(fields: [dayId], references: [id])
+
+  @@map("activities")
+}
+
+enum DAYS {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum ACTIVITY_TYPE {
+  RUN
+  BIKE
+  SWIM
+  STRENGTH
+  REST
+  WARM_UP
+  COOL_DOWN
+  TABATA
+  MOBILITY
+  CORE
+  FOR_TIME
+  EMOM
+  AMRAP
+  OTHER
+}
